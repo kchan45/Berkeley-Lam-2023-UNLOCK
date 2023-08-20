@@ -49,11 +49,19 @@ font = {'family' : 'serif',
 plt.rc('font', **font)  # pass in the font dict as kwargs
 
 if not collect_open_loop_data:
-    # load the normalization factor for intensity used in model generation
-    model = sio.loadmat(control_model_file)
-    dataInfo = model['dataInfo'].item()
-    I_NORMALIZATION = 1/float(dataInfo[4])
-    print(I_NORMALIZATION)
+    # load the processing information used in model generation
+    model = sio.loadmat(control_model_file, struct_as_record=False)
+    dataInfo = model['dataInfo'][0][0]
+    print(vars(dataInfo).keys())
+    if 'InormFactor' in vars(dataInfo).keys():
+        I_NORMALIZATION = 1/float(dataInfo.InormFactor)
+    else:
+        I_NORMALIZATION = 1.0
+    print("OES normalization factor: ", I_NORMALIZATION)
+    if 'baseline' in vars(dataInfo).keys():
+        baseline = dataInfo.baseline
+    else:
+        baseline = 0.0
 
 date = datetime.now().strftime('%Y_%m_%d_%H'+'h%M'+'m%S'+'s')
 print(f'Timestamp for save files: {date}')

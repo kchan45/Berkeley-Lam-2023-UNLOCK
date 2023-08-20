@@ -1,0 +1,11 @@
+matplotlib==3.5.3
+numpy==1.23.2
+scipy==1.9.0
+seabreeze==2.4.0
+# libusb1
+pyserial==3.5
+opencv-python==4.8.0.76
+# pyvisa
+python-usbtmc==0.8
+pyusb==1.2.1
+crcmod==1.7

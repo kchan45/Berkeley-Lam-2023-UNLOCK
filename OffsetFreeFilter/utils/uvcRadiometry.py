@@ -1,15 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from KCutils.uvctypes import *
-import time
+from utils.uvctypes import *
 import cv2
 import numpy as np
 try:
   from queue import Queue
 except ImportError:
   from Queue import Queue
-import platform
 
 BUF_SIZE = 2
 q = Queue(BUF_SIZE)
