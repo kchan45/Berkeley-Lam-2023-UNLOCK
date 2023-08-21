@@ -182,6 +182,8 @@ else:
 
 s = time.time()
 
+arduinoPI.close()
+
 ################################################################################
 # PROBLEM SETUP
 ################################################################################
@@ -223,6 +225,9 @@ if any([collect_open_loop_data, run_test]):
     ## Begin Experiment: Experiment with generated hardware code
     ############################################################################
     exp = Experiment(Nsim, saveDir)
+
+    arduinoPI = serial.Serial(arduinoAddress, baudrate=38400, timeout=1)
+    devices['arduinoPI'] = arduinoPI
 
     if collect_open_loop_data:
         # create input sequences
