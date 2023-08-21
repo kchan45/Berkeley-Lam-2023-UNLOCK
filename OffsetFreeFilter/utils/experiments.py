@@ -214,6 +214,7 @@ class Experiment():
         Ymeas = np.zeros((self.ny, self.Nsim+1))
         ctime = np.zeros(self.Nsim)   # computation time
         Yrefsim = np.zeros((self.nyc,self.Nsim))  # output reference/target (as sent to controller)
+        Yref = np.zeros((self.nyc,self.Nsim))  # true output reference/target
         if CEM:
             CEMsim = np.zeros((1,self.Nsim+1)) # CEM accumulation
         if mpc:
@@ -303,7 +304,8 @@ class Experiment():
                 totalIntensity = 100.0
                 
             # measurements are collected after a control input has been applied
-            Yrefsim[:,k] = self.myref(k)
+            Yrefsim[:,k] = self.myref(k*self.ts)
+            Yref[:,k] = self.myref(k*self.ts) + self.uss
             if k>0:
                 Ymeas[0,k] = Ts - self.xss[0]
                 Ymeas[1,k] = I706 - self.xss[1]
@@ -389,6 +391,7 @@ class Experiment():
         exp_data['Psave'] = Psave
         exp_data['qSave'] = qSave
         exp_data['Yrefsim'] = Yrefsim
+        exp_data['Yref'] = Yref
         exp_data['ctime'] = ctime
         exp_data['Xhat'] = Xhat
         exp_data['badTimes'] = badTimes
