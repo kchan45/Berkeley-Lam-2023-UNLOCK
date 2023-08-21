@@ -3,7 +3,7 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.io as sio
-import datetime
+from datetime import datetime
 import time
 from seabreeze.spectrometers import Spectrometer, list_devices
 import serial
@@ -30,10 +30,10 @@ plant_model_file = './models/APPJmodel_TEOS_UCB_LAM_modord3.mat'
 control_model_file = './models/APPJmodel_TEOS_UCB_LAM_modord3.mat'
 filter_val = None#0.9#None
 collect_open_loop_data = False
+run_test = True
 Ts0_des = 37.0  # desired initial surface temperature to make consistent experiments
 coolDownDiff = 1 # degrees to subtract from desired surface temperature for cooldown
 warmUpDiff = 1 # degrees to subtract from desired surface temperature for warming up
-run_test = False
 mpc_type = 'nominal'
 
 Fontsize = 14 # default font size for plots
@@ -150,16 +150,16 @@ else:
 # wait for cooldown
 appj.sendInputsArduino(arduinoPI, 0.0, 0.0, STARTUP_DUTY_CYCLE, arduinoAddress)
 arduinoPI.close()
-while appj.getSurfaceTemperature() > Ts0_des-coolDownDiff:
-    time.sleep(runOpts.tSampling)
-    print('cooling down ...')
+# while appj.getSurfaceTemperature() > Ts0_des-coolDownDiff:
+    # time.sleep(runOpts.tSampling)
+    # print('cooling down ...')
 arduinoPI = serial.Serial(arduinoAddress, baudrate=38400, timeout=1)
 time.sleep(2)
 appj.sendInputsArduino(arduinoPI, STARTUP_POWER, STARTUP_FLOW, STARTUP_DUTY_CYCLE, arduinoAddress)
-# wait for surface to reach desired starting temp
-while appj.getSurfaceTemperature() < Ts0_des-warmUpDiff:
-    time.sleep(runOpts.tSampling)
-    print('warming up ...')
+# # wait for surface to reach desired starting temp
+# while appj.getSurfaceTemperature() < Ts0_des-warmUpDiff:
+    # time.sleep(runOpts.tSampling)
+    # print('warming up ...')
 
 prevTime = (time.time()-s)*1e3
 # get initial measurements
@@ -182,8 +182,6 @@ else:
 
 s = time.time()
 
-arduinoPI.close()
-
 ################################################################################
 # PROBLEM SETUP
 ################################################################################
@@ -196,14 +194,14 @@ if not collect_open_loop_data:
         mpc_type = mpc_type,
         )
 
-    ts = prob_info['ts']
-    xss = prob_info['xss']
-    uss = prob_info['uss']
-    xssp = prob_info['xssp']
-    ussp = prob_info['ussp']
-    x_max = prob_info['x_max']
-    u_min = prob_info['u_min']
-    u_max = prob_info['u_max']
+    # ts = prob_info['ts']
+    # xss = prob_info['xss']
+    # uss = prob_info['uss']
+    # xssp = prob_info['xssp']
+    # ussp = prob_info['ussp']
+    # x_max = prob_info['x_max']
+    # u_min = prob_info['u_min']
+    # u_max = prob_info['u_max']
 
     # get controller
     if mpc_type == 'nominal':
@@ -256,6 +254,7 @@ if any([collect_open_loop_data, run_test]):
                                         prevTime=prevTime,
                                         )
     else:
+        exp.load_prob_info(prob_info)
         prevTime = (time.time()-s)*1e3
         exp_data = exp.run_closed_loop_mpc(c, 
                                            ioloop,
