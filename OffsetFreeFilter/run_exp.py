@@ -25,16 +25,15 @@ STARTUP_FLOW = 3.0 # default flow rate
 ### user inputs/options
 ts = 1.0 # sampling time, ensure it is the same as the model used
 Nsim = int(3*60/ts) # set the simulation horizon
-mpc_type = 'offset'
+mpc_type = 'nominal'
 plant_model_file = './models/APPJmodel_TEOS_UCB_LAM_modord3.mat'
 control_model_file = './models/APPJmodel_TEOS_UCB_LAM_modord3.mat'
 filter_val = None#0.9#None
-collect_open_loop_data = False
+collect_open_loop_data = True
 run_test = True
 Ts0_des = 37.0  # desired initial surface temperature to make consistent experiments
 coolDownDiff = 1 # degrees to subtract from desired surface temperature for cooldown
 warmUpDiff = 1 # degrees to subtract from desired surface temperature for warming up
-mpc_type = 'nominal'
 
 Fontsize = 14 # default font size for plots
 Lwidth = 3 # default line width for plots
@@ -89,6 +88,7 @@ runOpts.tSampling = ts
 arduinoAddress = appj.getArduinoAddress(os="ubuntu")
 print("Arduino Address: ", arduinoAddress)
 arduinoPI = serial.Serial(arduinoAddress, baudrate=38400, timeout=1)
+print(arduinoPI)
 s = time.time()
 # # Oscilloscope
 # oscilloscope = appj.Oscilloscope()       # Instantiate object from class
@@ -110,7 +110,9 @@ devices['instr'] = instr
 devices['spec'] = spec
 
 # send startup inputs
-time.sleep(2)
+time.sleep(5.0)
+appj.sendInputsArduino(arduinoPI, STARTUP_POWER, STARTUP_FLOW, STARTUP_DUTY_CYCLE, arduinoAddress)
+time.sleep(2.0)
 appj.sendInputsArduino(arduinoPI, STARTUP_POWER, STARTUP_FLOW, STARTUP_DUTY_CYCLE, arduinoAddress)
 input("Ensure plasma has ignited and press Return to begin.\n")
 
@@ -149,11 +151,11 @@ else:
 
 # wait for cooldown
 appj.sendInputsArduino(arduinoPI, 0.0, 0.0, STARTUP_DUTY_CYCLE, arduinoAddress)
-arduinoPI.close()
+# arduinoPI.close()
 # while appj.getSurfaceTemperature() > Ts0_des-coolDownDiff:
     # time.sleep(runOpts.tSampling)
     # print('cooling down ...')
-arduinoPI = serial.Serial(arduinoAddress, baudrate=38400, timeout=1)
+# arduinoPI = serial.Serial(arduinoAddress, baudrate=38400, timeout=1)
 time.sleep(2)
 appj.sendInputsArduino(arduinoPI, STARTUP_POWER, STARTUP_FLOW, STARTUP_DUTY_CYCLE, arduinoAddress)
 # # wait for surface to reach desired starting temp
@@ -182,7 +184,7 @@ else:
 
 s = time.time()
 
-arduinoPI.close()
+# arduinoPI.close()
 
 ################################################################################
 # PROBLEM SETUP
@@ -226,8 +228,8 @@ if any([collect_open_loop_data, run_test]):
     ############################################################################
     exp = Experiment(Nsim, saveDir)
 
-    arduinoPI = serial.Serial(arduinoAddress, baudrate=38400, timeout=1)
-    devices['arduinoPI'] = arduinoPI
+    # arduinoPI = serial.Serial(arduinoAddress, baudrate=38400, timeout=1)
+    # devices['arduinoPI'] = arduinoPI
 
     if collect_open_loop_data:
         # create input sequences

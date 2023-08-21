@@ -55,6 +55,7 @@ class RunOpts():
 
 def sendInputsArduino(arduino, appliedPower, flow, dutyCycle, arduinoAddress):
     arduino.reset_input_buffer()
+    time.sleep(0.5)
     # Send input values to the microcontroller to actuate them
     subprocess.run('echo "p,{:.2f}" > '.format(dutyCycle) + arduinoAddress, shell=True) #firmware v14
     time.sleep(0.5)
@@ -67,6 +68,7 @@ def sendInputsArduino(arduino, appliedPower, flow, dutyCycle, arduinoAddress):
 
 def sendControlledInputsArduino(arduino, appliedPower, flow, arduinoAddress):
     arduino.reset_input_buffer()
+    time.sleep(0.1)
     # Send input values to the microcontroller to actuate them
     subprocess.run('echo "w,{:.2f}" > '.format(appliedPower) + arduinoAddress, shell=True) #firmware v14
     time.sleep(0.05)

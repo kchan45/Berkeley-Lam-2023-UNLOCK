@@ -5,6 +5,7 @@ sys.dont_write_bytecode = True
 import numpy as np
 import matplotlib.pyplot as plt
 
+filepath = ''
 open_loop_data = True
 
 Fontsize = 14 # default font size for plots
@@ -18,8 +19,6 @@ font = {'family' : 'serif',
         'serif'  : 'Times',
         'size'   : Fontsize}
 plt.rc('font', **font)  # pass in the font dict as kwargs
-
-filepath = ''
 
 exp_data = np.load(filepath, allow_pickle=True).item()
 
