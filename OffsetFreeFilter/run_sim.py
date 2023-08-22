@@ -99,11 +99,11 @@ axes[1,1].plot(np.arange(len(fval))*ts, fval)
 axes[1,1].set_xlabel('Time (s)')
 axes[1,1].set_ylabel('Filter Value')
 
-axes[2,0].plot(np.arange(len(Pplot))*ts, Pplot, label='Nominal')
+axes[2,0].step(np.arange(len(Pplot))*ts, Pplot, label='Nominal')
 axes[2,0].set_xlabel('Time (s)')
 axes[2,0].set_ylabel('Applied Power (W)')
 
-axes[2,1].plot(np.arange(len(qplot))*ts, qplot, label='Nominal')
+axes[2,1].step(np.arange(len(qplot))*ts, qplot, label='Nominal')
 axes[2,1].set_xlabel('Time (s)')
 axes[2,1].set_ylabel('Helium Flow Rate (SLM)')
 
@@ -164,9 +164,9 @@ axes[0,1].plot(np.arange(len(I706))*ts, I706, label='Offset-free')
 
 axes[1,0].plot(np.arange(len(I777))*ts, I777, label='Offset-free')
 
-axes[2,0].plot(np.arange(len(Pplot))*ts, Pplot, label='Offset-free')
+axes[2,0].step(np.arange(len(Pplot))*ts, Pplot, label='Offset-free')
 
-axes[2,1].plot(np.arange(len(qplot))*ts, qplot, label='Offset-free')
+axes[2,1].step(np.arange(len(qplot))*ts, qplot, label='Offset-free')
 axes[2,1].legend()
 plt.tight_layout()
 plt.draw()

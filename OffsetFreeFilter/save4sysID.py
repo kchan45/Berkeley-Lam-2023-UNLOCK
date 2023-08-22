@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.io import savemat
 
+save_file = False
 filepath = './ExperimentalData/2023_08_21_17h31m03s/Backup/OL_data_0.npy'
 timestamp = filepath[19:39]
 print(timestamp)
@@ -92,6 +93,7 @@ axes[1].plot(u.T)
 axes[1].set_title('Inputs')
 plt.tight_layout()
 
-savemat(f'./models/{timestamp}_APPJ_model_train_data.mat', processing_info)
+if save_file:
+    savemat(f'./models/{timestamp}_APPJ_model_train_data.mat', processing_info)
 
 plt.show()
