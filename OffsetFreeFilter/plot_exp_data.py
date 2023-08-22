@@ -6,7 +6,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # filepath = './ExperimentalData/2023_08_21_14h30m33s/Backup/OL_data_0.npy'
-filepath = './ExperimentalData/2023_08_21_15h02m00s/Backup/OL_data_0.npy'
+# filepath = './ExperimentalData/2023_08_21_15h02m00s/Backup/OL_data_0.npy'
+filepath = './ExperimentalData/2023_08_21_17h31m03s/Backup/OL_data_0.npy'
 open_loop_data = True
 
 Fontsize = 14 # default font size for plots

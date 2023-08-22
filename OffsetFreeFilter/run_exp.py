@@ -10,7 +10,7 @@ import serial
 import asyncio
 
 # import custom code
-from config.my_system import get_prob_info
+from config.my_system import get_prob_info_exp
 from utils.controller import OffsetFreeMPC, NominalMPC
 from utils.observer import EKF
 import utils.APPJPythonFunctions as appj
@@ -26,8 +26,8 @@ STARTUP_FLOW = 3.0 # default flow rate
 ts = 1.0 # sampling time, ensure it is the same as the model used
 Nsim = int(3*60/ts) # set the simulation horizon
 mpc_type = 'nominal'
-plant_model_file = './models/APPJmodel_TEOS_UCB_LAM_modord3.mat'
-control_model_file = './models/APPJmodel_TEOS_UCB_LAM_modord3.mat'
+processing_info_file = './models/2023_08_21_17h31m03s_APPJ_model_train_data.mat'
+control_model_file = './models/2023_08_21_17h31m03s_APPJmodel.mat'
 filter_val = None#0.9#None
 collect_open_loop_data = True
 run_test = True
@@ -191,8 +191,8 @@ s = time.time()
 ################################################################################
 if not collect_open_loop_data:
     # get problem information
-    prob_info = get_prob_info(
-        plant_model_file=plant_model_file, 
+    prob_info = get_prob_info_exp(
+        processing_info_file=processing_info_file,
         control_model_file=control_model_file,
         filter_val=filter_val,
         mpc_type = mpc_type,

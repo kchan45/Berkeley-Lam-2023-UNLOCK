@@ -22,7 +22,7 @@ clear; close all;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % USER INPUTS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-filename = '2022_09_22_12h41m02s_OL_data+full_spectra.csv';
+filename = '2023_08_21_17h31m03s_APPJ_model_train_data.mat';
 data_direction = 0; % 0 for column-wise data, 1 for row-wise data
 ny = 3;
 nu = 2;
@@ -51,39 +51,19 @@ valid_split = 0.25;  % validation split, i.e. how much of the data to reserve fo
 saveModel = 1; % 1 for yes, 0 for no
 % specify an output file name, otherwise a default is used; please include
 % '.mat' in your filename
-out_filename = ['APPJmodel_TEOS_UCB_LAM_modord3_half', '.mat'];
+out_filename = ['APPJmodel_UCB_LAM_2023_08_21', '.mat'];
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % MAIN SCRIPT
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Load data
-data = readmatrix(filename, 'NumHeaderLines', 1);
-data = data(1:2:end,:);
-baseline_end = 30;
-baseline = data(1:baseline_end,:);
-data = data(baseline_end+1:end,:);
-udata = data(:,3:4);
-ydata = data(:,[1,1020,1233]);
-if data_direction
-    udata = udata'; % transpose data if row-wise
-    ydata = ydata'; % transpose data if row-wise
-end
-
-%% Clean data
-avg_baseline = mean(baseline,1);
-% subtract baseline intensities from data
-ydata(:,2:end) = ydata(:,2:end) - avg_baseline([1020,1233]);
-
-%% Center data
-steady_state_idx = 90;
-uss = mean(udata,1);
-yss = mean(ydata,1);
-udata = udata(30:end,:) - uss;
-ydata = ydata(30:end,:) - yss;
-
-% udata = udata(1:end/2,:);
-% ydata = ydata(1:end/2,:);
+data = load(filename);
+ydata = data.y';
+udata = data.u';
+yss = data.yss;
+uss = data.uss;
+out_filename = [data.timestamp, '_APPJmodel.mat'];
 
 %% Plot data to visualize it
 disp('Plotting data to visualize it... See Figure 1 to verify data.')
@@ -186,11 +166,8 @@ dataInfo.ydata = ydata;
 dataInfo.udata = udata;
 dataInfo.sys = sys;
 dataInfo.ypred = yCompare;
-dataInfo.baseline = avg_baseline;
     
 % save information on the performance of the identified model
-
-
 if saveModel
     % if output filename is not specified, generate one from a default
     if isempty(out_filename)

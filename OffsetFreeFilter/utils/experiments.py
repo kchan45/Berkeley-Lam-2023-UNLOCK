@@ -142,6 +142,13 @@ class Experiment():
                 instr = None
                 print(f'WARNING: {key} not in devices dict! Code will error...')
 
+        # get indices for intensity peaks used in model ID
+        I706idx = 1029
+        I777idx = 1232
+        if 'I706idx' in self.prob_info.keys():
+            I706idx = self.prob_info['I706idx']
+            I777idx = self.prob_info['I777idx']
+
         # run APPJ for a few seconds to normalize repeated experiments
         s = time.time()
         appj.sendInputsArduino(arduinoPI, self.uss[0], self.uss[1], 100, arduinoAddress)
@@ -157,8 +164,8 @@ class Experiment():
             specOut = tasks[1].result()
             I0 = specOut[0]*I_NORM
             spectra = specOut[1]
-            I706_0 = spectra[1029]
-            I777_0 = spectra[1232]
+            I706_0 = spectra[I706idx]
+            I777_0 = spectra[I777idx]
             oscOut = tasks[2].result()
             arduinoOut = tasks[3].result()
             outString = "Measured Outputs: Temperature: %.2f, Intensity: %.2f" % (Ts0, I0)
@@ -212,6 +219,7 @@ class Experiment():
         Dhat = np.zeros((self.nd,self.Nsim+1))
         Usim = np.zeros((self.nu, self.Nsim))
         Ymeas = np.zeros((self.ny, self.Nsim+1))
+        Ysim = np.zeros_like(Ymeas)
         ctime = np.zeros(self.Nsim)   # computation time
         Yrefsim = np.zeros((self.nyc,self.Nsim))  # output reference/target (as sent to controller)
         Yref = np.zeros((self.nyc,self.Nsim))  # true output reference/target
@@ -266,8 +274,8 @@ class Experiment():
                     intensitySpectrum = specOut[1]
                     wavelengths = specOut[2]
                     meanShift = specOut[3]
-                    I706 = intensitySpectrum[1029]
-                    I777 = intensitySpectrum[1232]
+                    I706 = intensitySpectrum[I706idx]
+                    I777 = intensitySpectrum[I777idx]
                 else:
                     print('Intensity data not collected! Spectrometer outputs will be set to -1.')
                     totalIntensity = -1
@@ -310,12 +318,20 @@ class Experiment():
                 Ymeas[0,k] = Ts - self.xss[0]
                 Ymeas[1,k] = I706 - self.xss[1]
                 Ymeas[2,k] = I777 - self.xss[2]
+                # process the output measurement so that it's compatible with 
+                # the fitted model
+                if 'output_proc' in self.prob_info.keys():
+                    Ysim[:,k] = self.prob_info['output_proc'](Ymeas[:,k]).full()
+                else:
+                    Ysim[:,k] = Ymeas[:,k]
+
+                # get state estimation
                 if observer is not None:
-                    xhat, dhat = observer.update_observer(Usim[:,k], Ymeas[:,k])
+                    xhat, dhat = observer.update_observer(Usim[:,k], Ysim[:,k])
                     Xhat[:,k] = np.ravel(xhat)
                     Dhat[:,k] = np.ravel(dhat)
                 else:
-                    Xhat[:,k] = Ymeas[:,k]
+                    Xhat[:,k] = Ysim[:,k]
 
                 if CEM:
                     CEMsim[:,k] = CEMsim[:,k-1] + np.ravel(self.prob_info['CEMadd'](Ts).full())
@@ -397,6 +413,7 @@ class Experiment():
         exp_data['badTimes'] = badTimes
         exp_data['Usim'] = Usim
         exp_data['Ymeas'] = Ymeas
+        exp_data['Ysim'] = Ysim
         if mpc:
             exp_data['Jsim'] = Jsim
             exp_data['Feasibility'] = Feasibility
