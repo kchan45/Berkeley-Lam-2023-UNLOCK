@@ -5,7 +5,8 @@ sys.dont_write_bytecode = True
 import numpy as np
 import matplotlib.pyplot as plt
 
-filepath = ''
+# filepath = './ExperimentalData/2023_08_21_14h30m33s/Backup/OL_data_0.npy'
+filepath = './ExperimentalData/2023_08_21_15h02m00s/Backup/OL_data_0.npy'
 open_loop_data = True
 
 Fontsize = 14 # default font size for plots
@@ -27,21 +28,26 @@ Iplot = exp_data['Isave']
 Pplot = exp_data['Psave']
 qplot = exp_data['qSave']
 specData = exp_data['specSave']
-I706plot = specData[1029,:]
-I777plot = specData[1232,:]
+I706plot = specData[:,1014]
+I777plot = specData[:,1226]
+# wavelengths = exp_data['waveSave'][0,:]
+# mask = ((wavelengths<778.0) & (wavelengths>776.0))
+# idx = np.arange(wavelengths.shape[0])
+# print(idx[mask])
+# print(wavelengths[mask])
 
 if open_loop_data:
-    fig, axes = plt.subplots(2,2, figsize=(8,8), sharex=True)
+    fig, axes = plt.subplots(2,2, figsize=(12,6), sharex=True)
     
-    axes[0,0].plot(Tplot)
+    axes[0,0].plot(Tplot[30:])
     axes[0,0].set_xlabel('Sampling Iteration')
-    axes[0,0].set_ylabel('Max Surface\nTemperature (^\circ C)')
+    axes[0,0].set_ylabel('Max Surface\nTemperature ($^\circ$ C)')
     
-    axes[0,1].plot(Iplot)
+    axes[0,1].plot(Iplot[30:])
     axes[0,1].set_xlabel('Sampling Iteration')
     axes[0,1].set_ylabel('Total Intensity\n(arb. units)')
     
-    axes[1,0].plot(Pplot)
+    axes[1,0].plot(Pplot[30:])
     axes[1,0].set_xlabel('Sampling Iteration')
     axes[1,0].set_ylabel('Applied Power (W)')
     
@@ -52,15 +58,15 @@ if open_loop_data:
     plt.tight_layout()
     plt.draw()
 
-    fig2, axes2 = plt.subplots(2,1, figsize=(8,4), sharex=True)
+    fig2, axes2 = plt.subplots(2,1, figsize=(8,4), sharex=False)
 
-    axes2[0,0].plot(I706plot)
-    axes2[0,0].set_xlabel('Sampling Iteration')
-    axes2[0,0].set_ylabel('Intensity at He706\n(arb. units)')
+    axes2[0].plot(I706plot[30:])
+    axes2[0].set_xlabel('Sampling Iteration')
+    axes2[0].set_ylabel('Intensity at He706\n(arb. units)')
 
-    axes2[1,0].plot(I777plot)
-    axes2[1,0].set_xlabel('Sampling Iteration')
-    axes2[1,0].set_ylabel('Intensity at O777\n(arb. units)')
+    axes2[1].plot(I777plot[30:])
+    axes2[1].set_xlabel('Sampling Iteration')
+    axes2[1].set_ylabel('Intensity at O777\n(arb. units)')
 
     plt.tight_layout()
     plt.draw()

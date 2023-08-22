@@ -198,15 +198,6 @@ if not collect_open_loop_data:
         mpc_type = mpc_type,
         )
 
-    # ts = prob_info['ts']
-    # xss = prob_info['xss']
-    # uss = prob_info['uss']
-    # xssp = prob_info['xssp']
-    # ussp = prob_info['ussp']
-    # x_max = prob_info['x_max']
-    # u_min = prob_info['u_min']
-    # u_max = prob_info['u_max']
-
     # get controller
     if mpc_type == 'nominal':
         c = NominalMPC(prob_info)
@@ -234,7 +225,7 @@ if any([collect_open_loop_data, run_test]):
     if collect_open_loop_data:
         # create input sequences
         uvec1 = np.linspace(1.5,3.5,5) # for power
-        uvec2 = np.linspace(3.5,7.5,9) # for flow rate
+        uvec2 = np.linspace(1.5,5.5,9) # for flow rate
         uu1,uu2 = np.meshgrid(uvec1,uvec2)
         uvec1 = uu1.reshape(-1,)
         uvec2 = uu2.reshape(-1,)
@@ -248,8 +239,8 @@ if any([collect_open_loop_data, run_test]):
         print(pseq)
         print(qseq)
 
-        pseq = np.repeat(pseq, 30/runOpts.tSampling).reshape(-1,)
-        qseq = np.repeat(qseq, 30/runOpts.tSampling).reshape(-1,)
+        pseq = np.repeat(pseq, 45/runOpts.tSampling).reshape(-1,)
+        qseq = np.repeat(qseq, 45/runOpts.tSampling).reshape(-1,)
         print(pseq.shape[0])
 
         prevTime = (time.time()-s)*1e3
