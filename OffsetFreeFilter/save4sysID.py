@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.io import savemat
 
-save_file = False
+save_file = True
 filepath = './ExperimentalData/2023_08_21_17h31m03s/Backup/OL_data_0.npy'
 timestamp = filepath[19:39]
 print(timestamp)
@@ -65,13 +65,20 @@ n_steady_state = int(45*3)
 y = np.vstack((Tplot, I706plot, I777plot))
 y_min = np.min(y, axis=1).reshape(-1,1)
 y_max = np.max(y, axis=1).reshape(-1,1)
-y = 2*(y-y_min)/(y_max-y_min) + 1
+y = 2*(y-y_min)/(y_max-y_min) - 1
 processing_info['y_min'] = y_min
 processing_info['y_max'] = y_max
 
 u = np.vstack((Pplot, qplot))
 u_min = np.min(u, axis=1)
 u_max = np.max(u, axis=1)
+
+fig, axes = plt.subplots(2,1, figsize=(12,8))
+axes[0].plot(y.T)
+axes[0].set_title('Outputs')
+axes[1].plot(u.T)
+axes[1].set_title('Inputs')
+plt.tight_layout()
 
 yss = np.mean(y[:, :n_steady_state], axis=1)
 print('yss: ', yss)

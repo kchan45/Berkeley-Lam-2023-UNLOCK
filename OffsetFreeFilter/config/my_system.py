@@ -72,6 +72,10 @@ def get_prob_info(
 
     myref = lambda t: myRef(t, ts, ref=np.array([55.0,3000.0])) - xss[:nyc] # reference signal
     # myref = lambda t: myRef(t, ts, ref=xss[:nyc]) - xss[:nyc] # reference signal
+    
+    # ------ use this for new LTI model for experiments -------
+    # myref = lambda t: myRef(t, ts, ref=np.array([0.6, -0.2])) - xss[:nyc] # reference signal
+    # ------ use this for new LTI model for experiments -------
 
     x0 = np.zeros((nx,)) # initial state
 
@@ -92,10 +96,17 @@ def get_prob_info(
     w_min = 0.0*np.ones((nw,))
     w_max = 0.0*np.ones((nw,))
 
+    # ------ use this for new LTI model for experiments -------
+    # y_min = -1*np.ones((ny,))-xss
+    # y_max = np.ones((ny,))-xss
+    # v_mu = 0
+    # v_sigma = 0.01
+    # ------ use this for new LTI model for experiments -------
+
     # initial variable guesses
     u_init = (u_min+u_max)/2
     x_init = np.zeros((nx,))#(x_min+x_max)/2
-    y_init = np.array([30, 1000, 1000])#(y_min+y_max)/2
+    y_init = (y_min+y_max)/2#np.array([30, 1000, 1000])#
 
     ## create casadi functions for problem
     # casadi symbols
@@ -286,10 +297,10 @@ def get_prob_info_exp(
     if 'y_min' in processing_info.keys():
         y_min_scale = processing_info['y_min']
         y_max_scale = processing_info['y_max']
-        yc_proc = 2*(yc-y_min_scale)/(y_max_scale-y_min_scale) + 1
+        yc_proc = 2*(yc-y_min_scale)/(y_max_scale-y_min_scale) - 1
         y_min_scale = np.ravel(y_min_scale)
         y_max_scale = np.ravel(y_max_scale)
-        ref_vals = 2*(ref_vals[:nyc]-y_min_scale[:nyc])/(y_max_scale[:nyc]-y_min_scale[:nyc]) + 1
+        ref_vals = 2*(ref_vals[:nyc]-y_min_scale[:nyc])/(y_max_scale[:nyc]-y_min_scale[:nyc]) - 1
     else:
         yc_proc = yc
 

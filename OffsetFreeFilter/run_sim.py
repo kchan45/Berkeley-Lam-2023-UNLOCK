@@ -13,6 +13,11 @@ ts = 1.0 # sampling time, ensure it is the same as the model used
 Nsim = int(10*60/ts) # set the simulation horizon
 plant_model_file = './models/APPJmodel_TEOS_UCB_LAM_modord3.mat'
 control_model_file = './models/APPJmodel_TEOS_UCB_LAM_modord3.mat'
+# for testing new LTI model for experiments 
+# (note: must change some parameters in my_system.py)
+# plant_model_file = './models/2023_08_21_17h31m03s_APPJmodel.mat'
+# control_model_file = './models/2023_08_21_17h31m03s_APPJmodel.mat'
+#
 filter_val = None#0.9#None
 
 Fontsize = 14 # default font size for plots
