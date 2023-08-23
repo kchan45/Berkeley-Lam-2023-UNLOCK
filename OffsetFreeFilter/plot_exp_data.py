@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 # filepath = './ExperimentalData/2023_08_21_15h02m00s/Backup/OL_data_0.npy'
 filepath = './ExperimentalData/2023_08_21_17h31m03s/Backup/OL_data_0.npy'
 filepath = './ExperimentalData/2023_08_22_13h59m50s/Backup/OL_data_0.npy'
+filepath = './ExperimentalData/2023_08_23_09h03m13s/Backup/OL_data_0.npy'
 
 ## closed loop data files
 # filepath = './ExperimentalData/2023_08_22_16h50m52s/Backup/Experiment_0.npy'

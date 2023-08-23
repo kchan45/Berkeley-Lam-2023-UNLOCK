@@ -25,7 +25,7 @@ STARTUP_FLOW = 3.0 # default flow rate
 ### user inputs/options
 ts = 1.0 # sampling time, ensure it is the same as the model used
 Nsim = int(3*60/ts) # set the simulation horizon
-mpc_type = 'nominal'
+mpc_type = 'offsetfree'
 processing_info_file = './models/2023_08_21_17h31m03s_APPJ_model_train_data.mat'
 control_model_file = './models/2023_08_21_17h31m03s_APPJmodel.mat'
 collect_open_loop_data = False
@@ -198,7 +198,7 @@ if not collect_open_loop_data:
     # get controller
     if mpc_type == 'nominal':
         c = NominalMPC(prob_info)
-    elif mpc_type == 'offset':
+    elif mpc_type == 'offsetfree':
         c = OffsetFreeMPC(prob_info)
     c.get_mpc()
     c.set_parameters([np.zeros((3,)), np.zeros((2,1)), np.zeros((2,1))])
@@ -261,6 +261,7 @@ if any([collect_open_loop_data, run_test]):
                                            )
 
 # turn off plasma jet (programmatically)
+appj.sendInputsArduino(arduinoPI, 0.0, 0.0, STARTUP_DUTY_CYCLE, arduinoAddress)
 appj.sendInputsArduino(arduinoPI, 0.0, 0.0, STARTUP_DUTY_CYCLE, arduinoAddress)
 arduinoPI.close()
 print(f"Experiments complete at {datetime.now().strftime('%Y_%m_%d_%H'+'h%M'+'m%S'+'s')}!\n"+

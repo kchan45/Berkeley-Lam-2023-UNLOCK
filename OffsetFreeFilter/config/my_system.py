@@ -274,7 +274,7 @@ def get_prob_info_exp(
     nw = nx         # process noise
     nv = ny         # measurement noise
     
-    ref_vals = np.array([55.0,1800.0])
+    ref_vals = np.array([55.0,1000.0])
     
     ## output processing from measurements
     ymeas = cas.SX.sym('ymeas', ny)
@@ -307,6 +307,7 @@ def get_prob_info_exp(
     output_proc = cas.Function('output_proc', [ymeas], [yc_proc])
     
     print(ref_vals)
+    ref_vals = np.array([0.6, -0.3])
     myref = lambda t: myRef(t, ts, ref=ref_vals) - xss[:nyc] # reference signal
     # myref = lambda t: myRef(t, ts, ref=xss[:nyc]) - xss[:nyc] # reference signal
 
@@ -315,7 +316,7 @@ def get_prob_info_exp(
     ## load/set MPC info
     # constraint bounds
     u_min = np.array([1.5, 1.5]) - uss
-    u_max = np.array([3.5,5.5]) - uss
+    u_max = np.array([3.5, 5.5]) - uss
     du_min = np.array([-0.5, -0.5])
     du_max = np.array([0.5,0.5])
     y_min = -1.0*np.ones((ny,)) - xss #np.array([25,0.0,0.0]) - xss
