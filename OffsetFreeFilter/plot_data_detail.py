@@ -33,6 +33,8 @@ def plot_data(filepaths, mpc_type, processing_info, fig_objs=None):
     I777idx = processing_info['I777idx']
     y_min_scale = processing_info['y_min']
     y_max_scale = processing_info['y_max']
+    mean_shift = processing_info['mean_shift']
+    background = np.ravel(processing_info['background'])
     yss = np.ravel(processing_info['yss'])
 
     if mpc_type == 'nominal':
@@ -52,7 +54,7 @@ def plot_data(filepaths, mpc_type, processing_info, fig_objs=None):
     q_datas = np.vstack([exp_data['qSave'] for exp_data in exp_datas])
     Yref = [exp_data['Yrefsim'] for exp_data in exp_datas][0]
     Tref = ((Yref[0,:] + yss[0]) + 1)/2 * (y_max_scale[0]-y_min_scale[0]) + y_min_scale[0]
-    I706ref = ((Yref[1,:] + yss[1]) + 1)/2 * (y_max_scale[1]-y_min_scale[1]) + y_min_scale[1]
+    I706ref = np.ravel(((Yref[1,:] + yss[1]) + 1)/2 * (y_max_scale[1]-y_min_scale[1]) + y_min_scale[1] + background[I706idx] + mean_shift)
 
     spec_datas = [exp_data['specSave'] for exp_data in exp_datas]
     I706_datas = np.vstack([np.ravel(specData[:,I706idx]) for specData in spec_datas])
