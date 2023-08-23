@@ -62,7 +62,6 @@ def sendInputsArduino(arduino, appliedPower, flow, dutyCycle, arduinoAddress):
     subprocess.run('echo "w,{:.2f}" > '.format(appliedPower) + arduinoAddress, shell=True) #firmware v14
     time.sleep(0.5)
     subprocess.run('echo "q,{:.2f}" > '.format(flow) + arduinoAddress, shell=True)
-    time.sleep(0.5)
     outString = "Input values: Power: %.2f, Flow: %.2f, Duty Cycle: %.2f" %(appliedPower,flow,dutyCycle)
     print(outString)
 

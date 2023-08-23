@@ -262,8 +262,41 @@ def get_prob_info_exp(
         nd = 0
     nw = nx         # process noise
     nv = ny         # measurement noise
+    
+    ref_vals = np.array([55.0,1800.0])
+    
+    ## output processing from measurements
+    ymeas = cas.SX.sym('ymeas', ny)
+    processing_info = io.loadmat(processing_info_file)
+    mean_shift = np.zeros((ny,))
+    if 'mean_shift' in processing_info.keys():
+        mean_shift = processing_info['mean_shift']
+    background = np.zeros((ny,1))
+    if 'background' in processing_info.keys():
+        background = np.ravel(processing_info['background'])
+        y2_idx = processing_info['I706idx']
+        y3_idx = processing_info['I777idx']
+    
+    y2 = ymeas[1] - mean_shift - background[y2_idx]
+    y3 = ymeas[2] - mean_shift - background[y3_idx]
+    yc = cas.vertcat(ymeas[0], y2, y3)
+    
+    ref_vals[1] = ref_vals[1] - mean_shift - background[y2_idx]
+    
+    if 'y_min' in processing_info.keys():
+        y_min_scale = processing_info['y_min']
+        y_max_scale = processing_info['y_max']
+        yc_proc = 2*(yc-y_min_scale)/(y_max_scale-y_min_scale) + 1
+        y_min_scale = np.ravel(y_min_scale)
+        y_max_scale = np.ravel(y_max_scale)
+        ref_vals = 2*(ref_vals[:nyc]-y_min_scale[:nyc])/(y_max_scale[:nyc]-y_min_scale[:nyc]) + 1
+    else:
+        yc_proc = yc
 
-    myref = lambda t: myRef(t, ts, ref=np.array([55.0,3000.0])) - xss[:nyc] # reference signal
+    output_proc = cas.Function('output_proc', [ymeas], [yc_proc])
+    
+    print(ref_vals)
+    myref = lambda t: myRef(t, ts, ref=ref_vals) - xss[:nyc] # reference signal
     # myref = lambda t: myRef(t, ts, ref=xss[:nyc]) - xss[:nyc] # reference signal
 
     x0 = np.zeros((nx,)) # initial state
@@ -271,22 +304,18 @@ def get_prob_info_exp(
     ## load/set MPC info
     # constraint bounds
     u_min = np.array([1.5, 1.5]) - uss
-    u_max = np.array([5,5]) - uss
+    u_max = np.array([3.5,5.5]) - uss
     du_min = np.array([-0.5, -0.5])
     du_max = np.array([0.5,0.5])
-    y_min = np.array([25,0.0,0.0]) - xss
-    y_max = np.array([65,5000,5000]) - xss
+    y_min = -1.0*np.ones((ny,)) - xss #np.array([25,0.0,0.0]) - xss
+    y_max = 1.0*np.ones((ny,)) - xss #np.array([65,5000,5000]) - xss
     x_min = y_min#-np.inf*np.ones((nx,))
     x_max = y_max#np.inf*np.ones((nx,))
-    v_mu = 0
-    v_sigma = 0.1
-    w_min = 0.0*np.ones((nw,))
-    w_max = 0.0*np.ones((nw,))
 
     # initial variable guesses
     u_init = (u_min+u_max)/2
     x_init = np.zeros((nx,))#(x_min+x_max)/2
-    y_init = np.array([30, 1000, 1000])#(y_min+y_max)/2
+    y_init = (y_min+y_max)/2
 
     ## create casadi functions for problem
     # casadi symbols
@@ -309,7 +338,6 @@ def get_prob_info_exp(
     h = cas.Function('h', [x,d], [y])
 
     # controlled output equation
-    ymeas = cas.SX.sym('ymeas', ny)
     yc = ymeas[:nyc]
     r = cas.Function('r', [ymeas], [yc])
 
@@ -342,25 +370,6 @@ def get_prob_info_exp(
     Qobs = 1e-7 * np.eye(nx+nd)
     Robs = 1e-6 * np.eye(ny)
 
-    ## output processing from measurements
-    processing_info = io.loadmat(processing_info_file)
-    mean_shift = np.zeros((ny,))
-    if 'mean_shift' in processing_info.keys():
-        mean_shift = processing_info['mean_shift']
-    background = np.zeros((ny,1))
-    if 'background' in processing_info.keys():
-        background = processing_info['background']
-        y2_idx = processing_info['I706idx']
-        y3_idx = processing_info['I777idx']
-    if 'y_min' in processing_info.keys():
-        y_min_scale = processing_info['y_min']
-        y_max_scale = processing_info['y_max']
-    y2 = ymeas[1] - mean_shift - background[y2_idx]
-    y3 = ymeas[2] - mean_shift - background[y3_idx]
-    yc = cas.vertcat(ymeas[0], y2, y3)
-    yc_proc = 2*(y-y_min_scale)/(y_max-y_min) + 1
-    output_proc = cas.Function('output_proc', [ymeas], [yc_proc])
-
     ## pack away problem info
     prob_info = {}
     prob_info['Np'] = Np
@@ -388,10 +397,6 @@ def get_prob_info_exp(
     prob_info['y_max'] = y_max
     prob_info['yc_min'] = y_min[:nyc]
     prob_info['yc_max'] = y_max[:nyc]
-    prob_info['v_mu'] = v_mu
-    prob_info['v_sigma'] = v_sigma
-    prob_info['w_min'] = w_min
-    prob_info['w_max'] = w_max
 
     prob_info['u_init'] = u_init
     prob_info['x_init'] = x_init

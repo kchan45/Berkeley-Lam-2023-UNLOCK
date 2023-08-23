@@ -28,8 +28,7 @@ Nsim = int(3*60/ts) # set the simulation horizon
 mpc_type = 'nominal'
 processing_info_file = './models/2023_08_21_17h31m03s_APPJ_model_train_data.mat'
 control_model_file = './models/2023_08_21_17h31m03s_APPJmodel.mat'
-filter_val = None#0.9#None
-collect_open_loop_data = True
+collect_open_loop_data = False
 run_test = True
 Ts0_des = 37.0  # desired initial surface temperature to make consistent experiments
 coolDownDiff = 1 # degrees to subtract from desired surface temperature for cooldown
@@ -110,9 +109,7 @@ devices['instr'] = instr
 devices['spec'] = spec
 
 # send startup inputs
-time.sleep(5.0)
 appj.sendInputsArduino(arduinoPI, STARTUP_POWER, STARTUP_FLOW, STARTUP_DUTY_CYCLE, arduinoAddress)
-time.sleep(2.0)
 appj.sendInputsArduino(arduinoPI, STARTUP_POWER, STARTUP_FLOW, STARTUP_DUTY_CYCLE, arduinoAddress)
 input("Ensure plasma has ignited and press Return to begin.\n")
 
@@ -129,10 +126,11 @@ print('measurement devices ready!')
 s = time.time()
 
 # let APPJ run for a bit
-STARTUP_POWER = 1.5
-STARTUP_FLOW = 1.5
+STARTUP_POWER = 3.0
+STARTUP_FLOW = 3.0
 appj.sendInputsArduino(arduinoPI, STARTUP_POWER, STARTUP_FLOW, STARTUP_DUTY_CYCLE, arduinoAddress)
 time.sleep(0.5)
+appj.sendInputsArduino(arduinoPI, STARTUP_POWER, STARTUP_FLOW, STARTUP_DUTY_CYCLE, arduinoAddress)
 
 w8 = input("Wait 5 min? [y,n]\n")
 if w8 == 'y':
@@ -149,15 +147,15 @@ if w8 == 'y':
 else:
     time.sleep(5)
 
-# wait for cooldown
-appj.sendInputsArduino(arduinoPI, 0.0, 0.0, STARTUP_DUTY_CYCLE, arduinoAddress)
+# # wait for cooldown
+# appj.sendInputsArduino(arduinoPI, 0.0, 0.0, STARTUP_DUTY_CYCLE, arduinoAddress)
 # arduinoPI.close()
 # while appj.getSurfaceTemperature() > Ts0_des-coolDownDiff:
     # time.sleep(runOpts.tSampling)
     # print('cooling down ...')
 # arduinoPI = serial.Serial(arduinoAddress, baudrate=38400, timeout=1)
-time.sleep(2)
-appj.sendInputsArduino(arduinoPI, STARTUP_POWER, STARTUP_FLOW, STARTUP_DUTY_CYCLE, arduinoAddress)
+# time.sleep(2)
+# appj.sendInputsArduino(arduinoPI, STARTUP_POWER, STARTUP_FLOW, STARTUP_DUTY_CYCLE, arduinoAddress)
 # # wait for surface to reach desired starting temp
 # while appj.getSurfaceTemperature() < Ts0_des-warmUpDiff:
     # time.sleep(runOpts.tSampling)
@@ -194,7 +192,6 @@ if not collect_open_loop_data:
     prob_info = get_prob_info_exp(
         processing_info_file=processing_info_file,
         control_model_file=control_model_file,
-        filter_val=filter_val,
         mpc_type = mpc_type,
         )
 
@@ -235,7 +232,7 @@ if any([collect_open_loop_data, run_test]):
         pseq = np.insert(pseq,0,[0.0,2.5,2.5,2.5])
         rng.shuffle(uvec2)
         qseq = np.copy(uvec2)
-        qseq = np.insert(qseq,0,[0.0,5.0,5.0,5.0])
+        qseq = np.insert(qseq,0,[0.0,3.5,3.5,3.5])
         print(pseq)
         print(qseq)
 
@@ -262,12 +259,6 @@ if any([collect_open_loop_data, run_test]):
                                            prevTime=prevTime,
                                            I_NORM=I_NORMALIZATION,
                                            )
-    arduinoPI.close()
-
-
-# reconnect Arduino
-arduinoPI = serial.Serial(arduinoAddress, baudrate=38400, timeout=1)
-devices['arduinoPI'] = arduinoPI
 
 # turn off plasma jet (programmatically)
 appj.sendInputsArduino(arduinoPI, 0.0, 0.0, STARTUP_DUTY_CYCLE, arduinoAddress)

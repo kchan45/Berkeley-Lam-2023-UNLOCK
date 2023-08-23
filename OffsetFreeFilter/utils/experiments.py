@@ -152,6 +152,7 @@ class Experiment():
         # run APPJ for a few seconds to normalize repeated experiments
         s = time.time()
         appj.sendInputsArduino(arduinoPI, self.uss[0], self.uss[1], 100, arduinoAddress)
+        appj.sendInputsArduino(arduinoPI, self.uss[0], self.uss[1], 100, arduinoAddress)
         print("starting up for 20 seconds")
         time.sleep(20)
         prevTime = (time.time()-s)*1e3
@@ -164,8 +165,9 @@ class Experiment():
             specOut = tasks[1].result()
             I0 = specOut[0]*I_NORM
             spectra = specOut[1]
-            I706_0 = spectra[I706idx]
-            I777_0 = spectra[I777idx]
+            meanShift = specOut[3]
+            I706_0 = spectra[I706idx] + meanShift
+            I777_0 = spectra[I777idx] + meanShift
             oscOut = tasks[2].result()
             arduinoOut = tasks[3].result()
             outString = "Measured Outputs: Temperature: %.2f, Intensity: %.2f" % (Ts0, I0)
@@ -231,15 +233,20 @@ class Experiment():
             Feasibility = np.zeros(self.Nsim) # feasibility of OCP
 
         # set initial states and reset controller for consistency
-        Ymeas[0,0] = Ts0 - self.xss[0]
-        Ymeas[1,0] = I706_0 - self.xss[1]
-        Ymeas[2,0] = I777_0 - self.xss[2]
+        Ymeas[0,0] = Ts0
+        Ymeas[1,0] = I706_0
+        Ymeas[2,0] = I777_0
+        if 'output_proc' in self.prob_info.keys():
+            output_proc = self.prob_info['output_proc']
+            Ysim[:,0] = np.ravel((output_proc(Ymeas[:,0])).full()) - self.xss
+        else:
+            Ysim[:,0] = Ymeas[:,0] - self.xss
         if observer is not None:
-            xhat, dhat = observer.update_observer(np.zeros((self.nu,1)), Ymeas[:,0])
+            xhat, dhat = observer.update_observer(np.zeros((self.nu,1)), Ysim[:,0])
             Xhat[:,0] = np.ravel(xhat)
             Dhat[:,0] = np.ravel(dhat)
         else:
-            Xhat[:,0] = Ymeas[:,k]
+            Xhat[:,0] = Ysim[:,0]
 
         count = 0
         # loop over simulation time
@@ -274,8 +281,8 @@ class Experiment():
                     intensitySpectrum = specOut[1]
                     wavelengths = specOut[2]
                     meanShift = specOut[3]
-                    I706 = intensitySpectrum[I706idx]
-                    I777 = intensitySpectrum[I777idx]
+                    I706 = intensitySpectrum[I706idx] + meanShift
+                    I777 = intensitySpectrum[I777idx] + meanShift
                 else:
                     print('Intensity data not collected! Spectrometer outputs will be set to -1.')
                     totalIntensity = -1
@@ -315,15 +322,18 @@ class Experiment():
             Yrefsim[:,k] = self.myref(k*self.ts)
             Yref[:,k] = self.myref(k*self.ts) + self.uss
             if k>0:
-                Ymeas[0,k] = Ts - self.xss[0]
-                Ymeas[1,k] = I706 - self.xss[1]
-                Ymeas[2,k] = I777 - self.xss[2]
+                Ymeas[0,k] = Ts
+                Ymeas[1,k] = I706
+                Ymeas[2,k] = I777
+                print('Measured Outputs: ', Ymeas[:,k])
                 # process the output measurement so that it's compatible with 
                 # the fitted model
                 if 'output_proc' in self.prob_info.keys():
-                    Ysim[:,k] = self.prob_info['output_proc'](Ymeas[:,k]).full()
+                    output_proc = self.prob_info['output_proc']
+                    Ysim[:,k] = np.ravel((output_proc(Ymeas[:,k])).full()) - self.xss
+                    print('Processed Ouputs: ', Ysim[:,k])
                 else:
-                    Ysim[:,k] = Ymeas[:,k]
+                    Ysim[:,k] = Ymeas[:,k] - self.xss
 
                 # get state estimation
                 if observer is not None:

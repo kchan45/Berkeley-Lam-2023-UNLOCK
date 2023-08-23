@@ -83,9 +83,7 @@ if __name__=="__main__":
     # devices['spec'] = spec
 
     # send startup inputs
-    time.sleep(5.0)
     appj.sendInputsArduino(arduinoPI, powerIn, flowIn, dutyCycleIn, arduinoAddress)
-    time.sleep(5.0)
     appj.sendInputsArduino(arduinoPI, powerIn, flowIn, dutyCycleIn, arduinoAddress)
 
     input("Ensure plasma has ignited and press Return to begin.\n")
@@ -105,7 +103,6 @@ if __name__=="__main__":
     # let APPJ run for a bit
     time.sleep(5.0)
     appj.sendInputsArduino(arduinoPI, 2.0, 1.5, dutyCycleIn, arduinoAddress)
-    time.sleep(2.0)
     appj.sendInputsArduino(arduinoPI, 2.0, 1.5, dutyCycleIn, arduinoAddress)
 
     print("Waiting 15 minutes to warm up the plasma jet...\n")
