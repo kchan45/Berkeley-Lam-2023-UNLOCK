@@ -307,7 +307,7 @@ def get_prob_info_exp(
     output_proc = cas.Function('output_proc', [ymeas], [yc_proc])
     
     print(ref_vals)
-    ref_vals = np.array([0.6, -0.3])
+    ref_vals = np.array([0.3, -0.1])
     myref = lambda t: myRef(t, ts, ref=ref_vals) - xss[:nyc] # reference signal
     # myref = lambda t: myRef(t, ts, ref=xss[:nyc]) - xss[:nyc] # reference signal
 
