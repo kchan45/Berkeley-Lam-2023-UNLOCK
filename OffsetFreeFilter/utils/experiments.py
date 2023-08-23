@@ -320,7 +320,7 @@ class Experiment():
                 
             # measurements are collected after a control input has been applied
             Yrefsim[:,k] = self.myref(k*self.ts)
-            Yref[:,k] = self.myref(k*self.ts) + self.xss
+            Yref[:,k] = self.myref(k*self.ts) + self.xss[:self.nyc]
             if k>0:
                 Ymeas[0,k] = Ts
                 Ymeas[1,k] = I706
