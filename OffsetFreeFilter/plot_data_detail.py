@@ -12,6 +12,7 @@ processing_info = loadmat(processing_info_file)
 
 # experiment switch
 experiment_name = 'off center' # options: ['no filter', 'center', 'off center']
+experiment_time = 'afternoon' # options: ['morning', 'afternoon']
 
 
 font_size = 14  # custom default font size for plots
@@ -59,6 +60,9 @@ def plot_data(filepaths, mpc_type, processing_info, fig_objs=None):
     spec_datas = [exp_data['specSave'] for exp_data in exp_datas]
     I706_datas = np.vstack([np.ravel(specData[:,I706idx]) for specData in spec_datas])
     I777_datas = np.vstack([np.ravel(specData[:,I777idx]) for specData in spec_datas])
+    Ymeas_datas = [exp_data['Ymeas'] for exp_data in exp_datas]
+    I706_datas = np.vstack([Ymeas[1,:-1] for Ymeas in Ymeas_datas])
+    I777_datas = np.vstack([Ymeas[2,:-1] for Ymeas in Ymeas_datas])
 
     meanT = np.ravel(np.mean(T_datas, axis=0))
     meanI706 = np.ravel(np.mean(I706_datas, axis=0))
@@ -151,44 +155,88 @@ def plot_data(filepaths, mpc_type, processing_info, fig_objs=None):
 # no filter
 if experiment_name == 'no filter':
     OD_value = 'no filter'
-    nominal_timestamps = [
-        '2023_08_23_10h05m43s',
-        '2023_08_23_10h10m23s',
-        '2023_08_23_10h15m04s',
-    ]
-    offset_timestamps = [
-        '2023_08_23_10h21m22s',
-        '2023_08_23_10h26m01s',
-        '2023_08_23_10h32m05s',
-    ]
+    if experiment_time == 'morning':
+        # morning
+        nominal_timestamps = [
+            '2023_08_23_10h05m43s',
+            '2023_08_23_10h10m23s',
+            '2023_08_23_10h15m04s',
+        ]
+        offset_timestamps = [
+            '2023_08_23_10h21m22s',
+            '2023_08_23_10h26m01s',
+            '2023_08_23_10h32m05s',
+        ]
+    elif experiment_time == 'afternoon':
+        # afternoon
+        nominal_timestamps = [
+            '2023_08_23_15h45m53s',
+            '2023_08_23_15h50m50s',
+            '2023_08_23_15h55m48s',
+        ]
+        offset_timestamps = [
+            '2023_08_23_16h01m22s',
+            '2023_08_23_16h05m58s',
+            '2023_08_23_16h11m00s',
+        ]
 
 # center
 elif experiment_name == 'center':
     OD_value = 'center'
-    nominal_timestamps = [
-        '2023_08_23_10h52m51s',
-        '2023_08_23_10h57m44s',
-        '2023_08_23_11h02m24s',
-    ]
-    offset_timestamps = [
-        '2023_08_23_11h08m47s',
-        '2023_08_23_11h13m25s',
-        '2023_08_23_11h18m06s',
-    ]
+    # morning
+    if experiment_time == 'morning':
+        nominal_timestamps = [
+            '2023_08_23_10h52m51s',
+            '2023_08_23_10h57m44s',
+            '2023_08_23_11h02m24s',
+        ]
+        offset_timestamps = [
+            '2023_08_23_11h08m47s',
+            '2023_08_23_11h13m25s',
+            '2023_08_23_11h18m06s',
+        ]
+
+    # afternoon
+    elif experiment_time == 'afternoon':
+        nominal_timestamps = [
+            '2023_08_23_16h22m06s',
+            '2023_08_23_16h26m47s',
+            '2023_08_23_16h32m21s',
+        ]
+        offset_timestamps = [
+            '2023_08_23_16h36m48s',
+            '2023_08_23_16h41m20s',
+            '2023_08_23_16h46m08s',
+        ]
 
 # ~1 cm off center
 elif experiment_name == 'off center':
     OD_value = '~1 cm off center'
-    nominal_timestamps = [
-        '2023_08_23_11h36m40s',
-        '2023_08_23_11h41m19s',
-        '2023_08_23_11h45m59s',
-    ]
-    offset_timestamps = [
-        '2023_08_23_11h50m40s',
-        '2023_08_23_11h56m39s',
-        '2023_08_23_12h01m36s',
-    ]
+    # morning
+    if experiment_time == 'morning':
+        nominal_timestamps = [
+            '2023_08_23_11h36m40s',
+            '2023_08_23_11h41m19s',
+            '2023_08_23_11h45m59s',
+        ]
+        offset_timestamps = [
+            '2023_08_23_11h50m40s',
+            '2023_08_23_11h56m39s',
+            '2023_08_23_12h01m36s',
+        ]
+
+    # afternoon
+    elif experiment_time == 'afternoon':
+        nominal_timestamps = [
+            '2023_08_23_16h59m26s',
+            '2023_08_23_17h04m04s',
+            '2023_08_23_17h08m37s',
+        ]
+        offset_timestamps = [
+            '2023_08_23_17h14m20s',
+            '2023_08_23_17h19m07s',
+            '2023_08_23_17h24m26s',
+        ]
 
 ## Plot Nominal
 filepaths = [f'./ExperimentalData/{t}/Backup/Experiment_0.npy' for t in nominal_timestamps]
