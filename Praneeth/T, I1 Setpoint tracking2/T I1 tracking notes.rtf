@@ -1,0 +1,61 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2580
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fswiss\fcharset0 Helvetica-Bold;\f2\fswiss\fcharset0 Helvetica-Oblique;
+}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh6360\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\fs36 \cf0 run_closed_loop\
+\
+
+\f1\b essentially starts from\
+\
+
+\f0\b0 \ul Instantiate container variables for storing simulation data:\ulnone \
+ = np.zeros((self.nx,self.Nsim+1))\
+
+\f1\b 3 rows
+\f0\b0 , 
+\f1\b Nsim+1 columns\
+
+\f0\b0 \
+Xhat = np.zeors_like(Xsim) - state estimation! brilliant\
+
+\f2\i Dhat - nd, Nsim+1? \
+
+\f0\i0 \
+Note this:\
+Ypred = np.zeros (3, Np, Nsim)\
+\
+ctime = np.zeros(Nsim)\
+Jsim = np.zeros(Nsim)\
+Yrefsim = np.zeros(1, Nsim+1)\
+Feas = np.zeros(Nsim)\
+\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f1\b \cf0 \ul \ulc0 initial states x0
+\f0\b0 \ulnone \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0 Xsim[:,0] = np.ravel(self.
+\f1\b x0
+\f0\b0 )\
+Xhat[:,0] = Xsim[:,0]\
+Ysim[:,0] = hp(Xsim[:,0], Vsim) - operate on hp!!\
+\
+dose_sim = np.zeros((1,self.Nsim+1))  # dose trajectory\
+\
+X0, href, h0\
+ that goes to the controller\
+\
+defined as\
+Xhat, Yrefsim, dose_sim\
+\
+\
+Xhat[:,k+1] = Xsim[:,k+1]\
+ \
+\
+\
+\
+}
