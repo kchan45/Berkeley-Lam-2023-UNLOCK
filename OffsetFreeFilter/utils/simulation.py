@@ -98,7 +98,7 @@ class Simulation():
                         multistage=False,
                         rand_seed2=0,
                         time_vary_filter=False,
-                        ):
+        ):
         """
         This method runs a closed-loop simulation of the system using
         information derived from loading problem information and a controller
@@ -131,28 +131,43 @@ class Simulation():
                 def filter_func(t, filter_val_init=filter_val):
                     if t<= 120:
                         return filter_val_init
-                    elif t<= 240:
-                        return filter_val_init*0.95
-                    elif t<= 360:
-                        return filter_val_init*0.9
-                    elif t<= 480:
-                        return filter_val_init*0.85
-                    elif t<= 600:
-                        return filter_val_init*0.8
-                    elif t<= 720:
-                        return filter_val_init*0.75
-                    elif t<= 840:
-                        return filter_val_init*0.7
-                    elif t<= 960:
-                        return filter_val_init*0.65
-                    else:
-                        return 0.6
+                    ###
+                    # elif t<= 240:
+                    #     return filter_val_init*0.95
+                    # elif t<= 360:
+                    #     return filter_val_init*0.9
+                    # elif t<= 480:
+                    #     return filter_val_init*0.85
+                    # elif t<= 600:
+                    #     return filter_val_init*0.8
+                    # elif t<= 720:
+                    #     return filter_val_init*0.75
+                    # elif t<= 840:
+                    #     return filter_val_init*0.7
+                    # elif t<= 960:
+                    #     return filter_val_init*0.65
+                    # else:
+                    #     return 0.6
+                    ###
+                    ###
                     # else:
                     #     val = (0.5-1.0)/(480-120)*t + 7.0/6
                     #     if val >= 0.5:
                     #         return val
                     #     else:
                     #         return 0.5
+                    ###
+                    ###
+                    elif t <= 360:
+                        val = (0.95-1.0)/(360-120)*t + 1.025
+                        return val
+                    elif t <= 840:
+                        val = (0.5-0.95)/(840-360)*t + 1.2875
+                        if val >= 0.5:
+                            return val
+                    else:
+                        return 0.5
+                    ###
 
         if multistage:
             Wset = self.prob_info['Wset']

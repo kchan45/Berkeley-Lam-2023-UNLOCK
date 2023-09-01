@@ -11,7 +11,7 @@ processing_info_file = './models/2023_08_21_17h31m03s_APPJ_model_train_data.mat'
 processing_info = loadmat(processing_info_file)
 
 # experiment switch
-experiment_name = 'off center' # options: ['no filter', 'center', 'off center']
+experiment_name = 'center' # options: ['no filter', 'center', 'off center']
 experiment_time = 'afternoon' # options: ['morning', 'afternoon']
 
 
@@ -126,25 +126,62 @@ def plot_data(filepaths, mpc_type, processing_info, fig_objs=None):
     axes[1,0].set_xlabel('Time (s)')
     axes[1,0].set_ylabel('Intensity at He777\nPeak (arb. units)')
 
-    axes[2,0].step(t, meanP, color=color, label=label)
-    axes[2,0].fill_between(
-        t, 
-        meanP-2*stdP, 
-        meanP+2*stdP, 
-        alpha=0.1,
-        color=color,
-    )
+    if first_plot:
+        axes[2,0].axhline(1.5, color='r', ls='--')
+        axes[2,0].text(0.9, 0.05, 'Minimum', fontsize='small',
+               horizontalalignment='center',
+               verticalalignment='center', 
+               transform=axes[2,0].transAxes,
+               color='r',
+               )
+        axes[2,0].axhline(3.5, color='r', ls='--')
+        axes[2,0].text(0.9, 0.95, 'Maximum', fontsize='small',
+               horizontalalignment='center',
+               verticalalignment='center', 
+               transform=axes[2,0].transAxes,
+               color='r',
+               )
+        
+        axes[2,1].axhline(1.5, color='r', ls='--')
+        axes[2,1].text(0.9, 0.05, 'Minimum', fontsize='small',
+               horizontalalignment='center',
+               verticalalignment='center', 
+               transform=axes[2,1].transAxes,
+               color='r',
+               )
+        axes[2,1].axhline(5.5, color='r', ls='--')
+        axes[2,1].text(0.9, 0.95, 'Maximum', fontsize='small',
+               horizontalalignment='center',
+               verticalalignment='center', 
+               transform=axes[2,1].transAxes,
+               color='r',
+               )
+
+    for Pdata in P_datas:
+        axes[2,0].step(t, Pdata, color=color, label=label, alpha=0.3)
+    # axes[2,0].step(t, meanP, color=color, label=label)
+    # axes[2,0].fill_between(
+    #     t, 
+    #     meanP-2*stdP, 
+    #     meanP+2*stdP, 
+    #     alpha=0.1,
+    #     color=color,
+    # )
+    axes[2,0].set_ylim(1.25, 3.75)
     axes[2,0].set_xlabel('Time (s)')
     axes[2,0].set_ylabel('Power (W)')
 
-    axes[2,1].step(t, meanq, color=color, label=label)
-    axes[2,1].fill_between(
-        t, 
-        meanq-2*stdq, 
-        meanq+2*stdq, 
-        alpha=0.1,
-        color=color,
-    )
+    for qdata in q_datas:
+        axes[2,1].step(t, qdata, color=color, label=label, alpha=0.3)
+    # axes[2,1].step(t, meanq, color=color, label=label)
+    # axes[2,1].fill_between(
+    #     t, 
+    #     meanq-2*stdq, 
+    #     meanq+2*stdq, 
+    #     alpha=0.1,
+    #     color=color,
+    # )
+    axes[2,1].set_ylim(1.0, 6.0)
     axes[2,1].set_xlabel('Time (s)')
     axes[2,1].set_ylabel('Helium Flow Rate\n(SLM)')
     plt.draw()

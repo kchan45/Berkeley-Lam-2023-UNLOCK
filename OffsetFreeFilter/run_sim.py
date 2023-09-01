@@ -1,4 +1,4 @@
-#@title Import Packages
+# Import Packages
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -10,7 +10,7 @@ from utils.observer import EKF
 
 ### user inputs/options
 ts = 1.0 # sampling time, ensure it is the same as the model used
-Nsim = int(10*60/ts) # set the simulation horizon
+Nsim = int(8*60/ts) # set the simulation horizon
 plant_model_file = './models/APPJmodel_TEOS_UCB_LAM_modord3.mat'
 control_model_file = './models/APPJmodel_TEOS_UCB_LAM_modord3.mat'
 # for testing new LTI model for experiments 
@@ -85,14 +85,14 @@ qplot = sim_data['Usim'][1,:] + ussp[1]
 fval = sim_data['fval_sim']
 
 fig, axes = plt.subplots(3,2, sharex=True, figsize=(12,8))
-axes[0,0].plot(np.arange(len(Tref))*ts, Tref, 'k--', label='Reference')
-axes[0,0].axhline(x_max[0]+xss[0], color='r', ls='--', label='Maximum')
-axes[0,0].plot(np.arange(len(Tplot))*ts, Tplot, label='Nominal')
+axes[0,0].plot(np.arange(len(Tref))*ts, Tref, 'k--', label='Setpoint')
+# axes[0,0].axhline(x_max[0]+xss[0], color='r', ls='--', label='Maximum')
+axes[0,0].plot(np.arange(len(Tplot))*ts, Tplot, label='Nominal MPC')
 axes[0,0].set_xlabel('Time (s)')
-axes[0,0].set_ylabel(r'Surface Temperature\n($^\circ C$)')
+axes[0,0].set_ylabel('Surface Temperature\n('+r'$^\circ$'+'C)')
 
-axes[0,1].plot(np.arange(len(I706ref))*ts, I706ref, 'k--', label='Reference')
-axes[0,1].plot(np.arange(len(I706))*ts, I706, label='Nominal')
+axes[0,1].plot(np.arange(len(I706ref))*ts, I706ref, 'k--', label='Setpoint')
+axes[0,1].plot(np.arange(len(I706))*ts, I706, label='Nominal MPC')
 axes[0,1].set_xlabel('Time (s)')
 axes[0,1].set_ylabel('Intensity at He706\nPeak (arb. units)')
 
@@ -100,14 +100,42 @@ axes[1,0].plot(np.arange(len(I777))*ts, I777, label='Nominal')
 axes[1,0].set_xlabel('Time (s)')
 axes[1,0].set_ylabel('Intensity at O777\nPeak (arb. units)')
 
-axes[1,1].plot(np.arange(len(fval))*ts, fval)
+axes[1,1].plot(np.arange(len(fval))*ts, fval, color='g')
 axes[1,1].set_xlabel('Time (s)')
 axes[1,1].set_ylabel('Filter Value')
 
+axes[2,0].axhline(u_max[0]+uss[0], color='r', ls='--')
+axes[2,0].text(0.9, 0.9, 'Maximum', fontsize='small',
+               horizontalalignment='center',
+               verticalalignment='center', 
+               transform=axes[2,0].transAxes,
+               color='r',
+               )
+axes[2,0].axhline(u_min[0]+uss[0], color='r', ls='--')
+axes[2,0].text(0.9, 0.1, 'Minimum', fontsize='small',
+               horizontalalignment='center',
+               verticalalignment='center', 
+               transform=axes[2,0].transAxes,
+               color='r',
+               )
 axes[2,0].step(np.arange(len(Pplot))*ts, Pplot, label='Nominal')
 axes[2,0].set_xlabel('Time (s)')
 axes[2,0].set_ylabel('Applied Power (W)')
 
+axes[2,1].axhline(u_max[1]+uss[1], color='r', ls='--')
+axes[2,1].text(0.9, 0.9, 'Maximum', fontsize='small',
+               horizontalalignment='center',
+               verticalalignment='center', 
+               transform=axes[2,1].transAxes,
+               color='r',
+               )
+axes[2,1].axhline(u_min[1]+uss[1], color='r', ls='--')
+axes[2,1].text(0.9, 0.1, 'Minimum', fontsize='small',
+               horizontalalignment='center',
+               verticalalignment='center', 
+               transform=axes[2,1].transAxes,
+               color='r',
+               )
 axes[2,1].step(np.arange(len(qplot))*ts, qplot, label='Nominal')
 axes[2,1].set_xlabel('Time (s)')
 axes[2,1].set_ylabel('Helium Flow Rate (SLM)')
@@ -163,16 +191,18 @@ Pplot = sim_data['Usim'][0,:] + ussp[0]
 qplot = sim_data['Usim'][1,:] + ussp[1]
 fval = sim_data['fval_sim']
 
-axes[0,0].plot(np.arange(len(Tplot))*ts, Tplot, label='Offset-free')
+axes[0,0].plot(np.arange(len(Tplot))*ts, Tplot, label='Offset-free MPC')
+axes[0,0].legend(fontsize='small', loc='upper center')
 
-axes[0,1].plot(np.arange(len(I706))*ts, I706, label='Offset-free')
+axes[0,1].plot(np.arange(len(I706))*ts, I706, label='Offset-free MPC')
+axes[0,1].legend(fontsize='small', loc='lower center')
 
 axes[1,0].plot(np.arange(len(I777))*ts, I777, label='Offset-free')
 
 axes[2,0].step(np.arange(len(Pplot))*ts, Pplot, label='Offset-free')
 
 axes[2,1].step(np.arange(len(qplot))*ts, qplot, label='Offset-free')
-axes[2,1].legend()
+# axes[2,1].legend(fontsize='small', loc='best')
 plt.tight_layout()
 plt.draw()
 ax.plot(sim_data['Jsim'], label='Offset-free')

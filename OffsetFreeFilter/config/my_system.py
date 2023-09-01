@@ -77,7 +77,7 @@ def get_prob_info(
     # myref = lambda t: myRef(t, ts, ref=np.array([0.6, -0.2])) - xss[:nyc] # reference signal
     # ------ use this for new LTI model for experiments -------
 
-    x0 = np.zeros((nx,)) # initial state
+    x0 = np.array([58.0,2950.0,4400.0]) - xss#np.zeros((nx,)) # initial state
 
     ## load/set MPC info
     # constraint bounds
